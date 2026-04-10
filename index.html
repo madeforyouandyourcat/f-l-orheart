@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Florheart</title>
+     <script defer src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.min.js"></script>
+  <script defer src="script.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- เพิ่มการโหลด face-api.js -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+       body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+    overflow: hidden;
+}
+        #homePage {
+            width: 100%; /* กำหนดความกว้างตามต้องการ */
+            height: 100%; /* กำหนดความสูงตามต้องการ */
+            max-width: 100vw; /* ปรับให้พอดีกับหน้าจอ */
+            max-height: 100vh; /* ปรับให้พอดีกับหน้าจอ */
+            margin: 0 auto; /* จัดกึ่งกลาง */
+            background-image: url('https://i.postimg.cc/q7cxQJ5G/BG.png');
+            background-size: contain; /* เปลี่ยนจาก cover เป็น contain */
+            background-position: center;
+            background-repeat: no-repeat; /* ไม่ให้รูปซ้ำ */
+        }
+        
+        .home-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .page {
+         display: none;
+         width: 100%;
+         height: 100%;
+         position: fixed;
+         top: 0;
+         left: 0;
+         overflow-y: auto;          /* scroll ได้ภายใน page */
+         overflow-x: hidden;
+         -webkit-overflow-scrolling: touch;
+         background-size: cover;
+         background-position: center;
+         background-repeat: no-repeat;
+}
+
+        .page.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+       /* ปุ่มกลับหน้าแรก - Responsive */
+        .home-button {
+            position: fixed;
+            bottom: 7vh;          /* ระยะจากขอบล่างตามสัดส่วนจอ */
+            left: 6vw;            /* ระยะจากขอบซ้ายตามสัดส่วนจอ */
+    
+            width: clamp(30px, 6vw, 55px);   /* ย่อ-ขยายตามจอ */
+            height: clamp(30px, 6vw, 55px);
+
+            background: rgba(5, 46, 71, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            border: 2px solid rgba(11, 87, 102, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+}
+
+        .home-button:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .home-button:active {
+            transform: translateY(-1px);
+        }
+
+        .home-button i {
+            font-size: 24px;
+            color: white;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        /* เอฟเฟกต์ wave เมื่อคลิก */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple-animation 0.6s ease-out;
+        }
+
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* Tooltip - Responsive */
+.tooltip {
+    position: absolute;
+
+    bottom: 120%;          /* ลอยเหนือปุ่ม */
+    left: 50%;             /* กึ่งกลางปุ่ม */
+    transform: translateX(-50%);
+
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+
+    padding: 0.5rem 0.8rem;
+    border-radius: 6px;
+
+    font-size: clamp(12px, 1.2vw, 14px);
+    white-space: nowrap;
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+        .tooltip::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid rgba(0, 0, 0, 0.8);
+        }
+
+        .home-button:hover .tooltip {
+            opacity: 1;
+        }
+
+        /* หน้าแรก - florheart-01.png */
+        #homePage {
+            background-image: url('https://i.postimg.cc/q7cxQJ5G/BG.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .home-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .glow-graphic {
+    width: 100%;
+    max-width: 1100px;
+    height: auto;
+}
+        @keyframes glow {
+            from { filter: brightness(1); }
+            to { filter: brightness(1.2); }
+        }
+
+        /* ปุ่มกดสตาร์ท - Responsive */
+.quiz-btn {
+    position: absolute;
+    right: 5vw;      /* ระยะจากขอบขวาแบบยืดหยุ่น */
+    bottom: 11vh;     /* ระยะจากขอบล่างแบบยืดหยุ่น */
+    width: clamp(140px, 22vw, 250px);  /* ย่อ-ขยายตามจอ */
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.quiz-btn:hover {
+    transform: scale(1.05);
+}
+
+        .quiz-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* หน้าคำถาม 1 - florheart-02.png */
+        #quiz1 {
+            background-image: url('https://i.postimg.cc/MpgXthCr/Quiz-background-1-6.png');
+            background-size: cover;
+            background-position: center;
+        }
+.quiz-container {
+    width: 100%;
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: clamp(60px, 8vh, 100px);
+    padding-bottom: 150px;    /* ← เพิ่ม padding ล่างให้ปุ่ม Next ไม่บัง */
+    position: relative;
+    box-sizing: border-box;
+}
+
+        /* รูปคำถาม */
+.question-image {
+    width: clamp(200px, 50vw, 600px);   /* ลดจาก 1000px → 700px */
+    height: auto;
+    margin-top: 3vh;
+    margin-bottom: 4vh;
+}
+
+/* Grid คำตอบ - จอใหญ่ */
+.answers-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3vh 4vw;   /* ลดช่องไฟลง */
+
+    width: 90%;     /* ไม่ให้เต็ม 100% */
+    max-width: 800px;  /* ลดจาก 1000px */
+    margin: 0 auto 4vh auto;
+}
+
+/* ตัวเลือก */
+.answer-option {
+    width: 100%;
+    max-width: 300px;   /* ลดจาก 400px */
+    height: auto;
+
+    justify-self: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.answer-option:hover {
+    transform: scale(1.05);
+}
+
+/* มือถือ */
+@media (max-width: 768px) {
+    .answers-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5vh;
+    }
+
+    .answer-option {
+        max-width: 100%;
+    }
+}
+
+.answer-option:hover {
+    transform: scale(1.05);
+}
+        .answer-option:hover {
+            transform: scale(1.05);
+            filter: brightness(1.1);
+        }
+
+        .answer-option.selected {
+            filter: brightness(1.2);
+            transform: scale(1.1);
+        }
+        .next-btn-container {
+            position: fixed;
+            right: 6vw;      /* ใช้ vw แทน px จะ responsive กว่า */
+            bottom: 8vh;
+}
+
+        .next-btn {
+    width: clamp(30px, 4vw, 150px);  
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.next-btn:hover {
+    transform: scale(1.08);  /* ลดแรงขยายลงนิด */
+}
+
+/* มือถือ */
+@media (max-width: 768px) {
+    .next-btn {
+        width: 50px;
+    }
+}
+        /* หน้าคำถาม 2 - florheart-03.png */
+        #quiz2 {
+            background-image: url('https://i.postimg.cc/MpgXthCr/Quiz-background-1-6.png');
+            background-size:1366px*768px;
+            background-position: center;
+        }
+
+        /* หน้าคำถาม 3 - florheart-04.png */
+        #quiz3 {
+            background-image: url('https://i.postimg.cc/MpgXthCr/Quiz-background-1-6.png');
+            background-size:1366px*768px;
+            background-position: center;
+        }
+
+        /* หน้าคำถาม 4 - florheart-05.png */
+        #quiz4 {
+            background-image: url('https://i.postimg.cc/MpgXthCr/Quiz-background-1-6.png');
+            background-size:1366px*768px;
+            background-position: center;
+        }
+
+        /* หน้าคำถาม 5 - florheart-06.png */
+        #quiz5 {
+            background-image: url('https://i.postimg.cc/MpgXthCr/Quiz-background-1-6.png');
+            background-size:1366px*768px;
+            background-position: center;
+        }
+
+        /* หน้าคำถาม 6 - florheart-07.png */
+        #quiz6 {
+            background-image: url('https://i.postimg.cc/MpgXthCr/Quiz-background-1-6.png');
+            background-size:1366px*768px;
+            background-position: center;
+        }
+
+        /* หน้ากล้อง - florheart-08.png */
+        #cameraPage {
+        background-size: cover; /* ปรับเป็น cover สำหรับวิดีโอ */
+        background-position: center;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding-left: 40px;
+        position: relative; /* เพิ่มเพื่อรองรับวิดีโอพื้นหลัง */
+        width: 100vw;
+        height: 100vh;
+        overflow-y: auto;      /* ← เปลี่ยนจาก hidden เป็น auto */
+        overflow-x: hidden;
+}
+
+    /* เพิ่มคลาสสำหรับวิดีโอพื้นหลัง */
+    .bg-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1; /* ให้อยู่ข้างหลังเนื้อหา */
+}
+
+.camera-container {
+    position: relative;
+    margin-left: clamp(16px, 8vw, 80px);
+    margin-bottom: 16px;
+    width: clamp(280px, 55vw, 570px);  /* ← เปลี่ยนตรงนี้ */
+}
+
+.camera-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 60vh;               /* ← ลดจาก 80vh */
+    background-color: #ffffff;
+    border-radius: clamp(8px, 2vw, 20px);
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.camera-frame video,
+#video {
+    position: absolute;             /* รวม 2 selector เป็นอันเดียว */
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+    .shoot-btn {
+    position: absolute;
+    top: 50%;                    /* กึ่งกลางแนวตั้ง */
+    transform: translateY(-50%); /* ชดเชยความสูงปุ่ม */
+    right: 13%;                   /* ห่างจากขวา */
+    width: clamp(120px, 18vw, 280px); /* ขนาดยืดหยุ่น */
+    height: auto;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.shoot-btn:hover {
+    transform: translateY(-50%) scale(1.1); /* ต้องใส่ translateY ด้วย ไม่งั้นกระโดด */
+}
+  /* เพิ่มส่วนนี้สำหรับนับถอยหลัง */
+        #countdown-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 180px;
+            color: white;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+            z-index: 10;
+            pointer-events: none;
+            display: none; /* ซ่อนไว้ก่อน */
+            animation: pulse 1s infinite;
+        }
+
+        .shoot-btn.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            transform: scale(1); /* ยกเลิก hover effect */
+        }
+
+        @keyframes pulse {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* หน้าโหลดดิ้ง - florheart-09.png */
+        #loadingPage {
+            background-color:#FFF;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        /* ลบอันแรกออก เหลือแค่นี้ */
+.result-container {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.result-decoration {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.captured-img {
+    position: absolute;
+    top: 23%;
+    right: 9.7%;
+    width: 40.5%;
+    height: 40%;
+    aspect-ratio: 2444 / 2126;
+    object-fit: cover;
+    z-index: 1;
+    cursor: pointer;
+}
+
+.result-text {
+    position: absolute;
+    bottom: 12%;
+    right: 5%;
+    width: clamp(280px, 38vw, 680px);
+    color: white;
+    font-size: clamp(14px, 2vw, 24px);
+    font-weight: bold;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
+    z-index: 3;
+    line-height: 1.8;
+}  /* ← อย่าลืมปิด } ด้วยนะคะ */
+        /* หน้าผลลัพธ์ NIGHT-BLOOM - florheart-11.png */
+        #resultNightBloom {
+            background-image: url('https://i.postimg.cc/bN40KFbW/bg-2.png');
+            background-size:cover;
+            background-position: center;
+           
+        }
+
+        /* หน้าผลลัพธ์ NIGHT-CLOSE - florheart-12.png */
+        #resultNightClose {
+            background-image: url('https://i.postimg.cc/bN40KFbW/bg-2.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* หน้าผลลัพธ์ BUD - florheart-13.png */
+        #resultBud {
+            background-image: url('https://i.postimg.cc/SNn71pXw/bg-3.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* หน้าผลลัพธ์ EARLY-BLOOM - florheart-14.png */
+        #resultEarlyBloom {
+            background-image: url('https://i.postimg.cc/gkxqtPwg/bg-1.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* หน้าผลลัพธ์ EARLY-CLOSED */
+        #resultEarlyClosed {
+            background-image: url('https://i.postimg.cc/gkxqtPwg/bg-1.png');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        /* ป้องกันการ zoom */
+    </style>
+    <script>
+        let resultLockUntil = 0;
+
+function lockResult(seconds = 10) { // ล็อก 10 วิหลังโชว์ผล
+  resultLockUntil = Date.now() + seconds * 1000;
+}
+
+function canNavigate() {
+  return Date.now() >= resultLockUntil;
+}
+
+const _showPage = (pageId) => {
+  console.log('[NAV] ->', pageId, 'lock?', !canNavigate());
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+
+  // เปิดกล้องเมื่อเข้าหน้า camera
+  if (pageId === 'cameraPage') {
+    setTimeout(initCamera, 100);
+    
+    // === เพิ่มส่วนนี้เพื่อแก้ไขบัค ===
+    // รีเซ็ตสถานะปุ่มถ่ายรูปให้สามารถกดได้ใหม่
+    const shootButton = document.querySelector('.shoot-btn');
+    if (shootButton) {
+        shootButton.classList.remove('disabled');
+    }
+    // ซ่อนตัวเลขนับถอยหลังถ้ามันกำลังแสดงอยู่
+    const countdownEl = document.getElementById('countdown-display');
+    if (countdownEl) {
+        countdownEl.style.display = 'none';
+    }
+  }
+};
+// ใช้ตัวนี้แทนเดิมทุกที่
+function showPage(pageId) {
+  // ถ้าพยายามกลับบ้านตอนล็อกอยู่ ให้บล็อก
+  if ((pageId === 'homePage' || pageId === 'cameraPage') && !canNavigate()) {
+    console.warn('[NAV] blocked while locked to result');
+    return;
+  }
+  _showPage(pageId);
+}
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</head>
+<body>
+    <div class="main-container">
+        <!-- หน้าแรก - florheart-01.png -->
+        <div id="homePage" class="page active">
+            <div class="home-content">
+                <img src="https://i.postimg.cc/QMv71Hsc/WITHOUT-MOTION.png" alt="Graphic" class="glow-graphic">
+                <img src="https://i.postimg.cc/0ywfMddQ/Quiz-TAP.png" alt="Start Quiz" class="quiz-btn" onclick="startQuiz()">
+            </div>
+        </div>
+
+        <!-- หน้าคำถาม 1 - florheart-02.png -->
+        <div id="quiz1" class="page">
+
+            <!-- ปุ่มกลับหน้าแรก -->
+            <div class="home-button" onclick="goHome(this, event)">
+                <i class="fas fa-home"></i>
+                <span class="tooltip">กลับหน้าแรก</span>
+            </div>
+            
+            <div class="quiz-container">
+                <img src="https://i.postimg.cc/xCWBwyQX/Q1.png" alt="Question 1" class="question-image">
+                <div class="answers-grid">
+                    <img src="https://i.postimg.cc/qR9WPXr3/image.png" alt="Answer 1" class="answer-option" data-score="4" onclick="selectAnswer(this, 4)">
+                    <img src="https://i.postimg.cc/3RPzsChQ/image.png" alt="Answer 2" class="answer-option" data-score="3" onclick="selectAnswer(this, 3)">
+                    <img src="https://i.postimg.cc/KzdC6rb2/image.png" alt="Answer 3" class="answer-option" data-score="2" onclick="selectAnswer(this, 2)">
+                    <img src="https://i.postimg.cc/KzdC6rbb/image.png" alt="Answer 4" class="answer-option" data-score="1" onclick="selectAnswer(this, 1)">
+                </div>
+                <div class="next-btn-container">
+                    <img src="https://i.postimg.cc/3RJHQYW7/NEXT.png" alt="Next" class="next-btn" onclick="nextQuestion(2)">
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้าคำถาม 2 - florheart-03.png -->
+        <div id="quiz2" class="page">
+            <!-- ปุ่มกลับหน้าแรก -->
+            <div class="home-button" onclick="goHome(this)">
+                <i class="fas fa-home"></i>
+                <span class="tooltip">กลับหน้าแรก</span>
+            </div>
+            
+            <div class="quiz-container">
+                <img src="https://i.postimg.cc/3JH7w3g6/Q2.png" alt="Question 2" class="question-image">
+                <div class="answers-grid">
+                    <img src="https://i.postimg.cc/wTdHB9h0/image.png" alt="Answer 1" class="answer-option" data-score="4" onclick="selectAnswer(this, 4)">
+                    <img src="https://i.postimg.cc/c4NZJdQ9/image.png" alt="Answer 2" class="answer-option" data-score="3" onclick="selectAnswer(this, 3)">
+                    <img src="https://i.postimg.cc/DyKFz7qC/image.png" alt="Answer 3" class="answer-option" data-score="2" onclick="selectAnswer(this, 2)">
+                    <img src="https://i.postimg.cc/7YyDLq3k/image.png" alt="Answer 4" class="answer-option" data-score="1" onclick="selectAnswer(this, 1)">
+                </div>
+                <div class="next-btn-container">
+                    <img src="https://i.postimg.cc/3RJHQYW7/NEXT.png" alt="Next" class="next-btn" onclick="nextQuestion(3)">
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้าคำถาม 3 - florheart-04.png -->
+        <div id="quiz3" class="page">
+            <!-- ปุ่มกลับหน้าแรก -->
+            <div class="home-button" onclick="goHome(this)">
+                <i class="fas fa-home"></i>
+                <span class="tooltip">กลับหน้าแรก</span>
+            </div>
+            
+            <div class="quiz-container">
+                <img src="https://i.postimg.cc/8ccvJh80/Q3.png" alt="Question 3" class="question-image">
+                <div class="answers-grid">
+                    <img src="https://i.postimg.cc/J00XDbV8/image.png" alt="Answer 1" class="answer-option" data-score="4" onclick="selectAnswer(this, 4)">
+                    <img src="https://i.postimg.cc/cCC3gQqP/image.png" alt="Answer 2" class="answer-option" data-score="3" onclick="selectAnswer(this, 3)">
+                    <img src="https://i.postimg.cc/6qqZ2dJ6/image.png" alt="Answer 3" class="answer-option" data-score="2" onclick="selectAnswer(this, 2)">
+                    <img src="https://i.postimg.cc/QCC79pGr/image.png" alt="Answer 4" class="answer-option" data-score="1" onclick="selectAnswer(this, 1)">
+                </div>
+                <div class="next-btn-container">
+                    <img src="https://i.postimg.cc/3RJHQYW7/NEXT.png" alt="Next" class="next-btn" onclick="nextQuestion(4)">
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้าคำถาม 4 - florheart-05.png -->
+        <div id="quiz4" class="page">
+            <!-- ปุ่มกลับหน้าแรก -->
+            <div class="home-button" onclick="goHome(this)">
+                <i class="fas fa-home"></i>
+                <span class="tooltip">กลับหน้าแรก</span>
+            </div>
+            
+            <div class="quiz-container">
+                <img src="https://i.postimg.cc/tg77z9vS/Q4.png" alt="Question 4" class="question-image">
+                <div class="answers-grid">
+                    <img src="https://i.postimg.cc/W4KzWxxY/image.png" alt="Answer 1" class="answer-option" data-score="4" onclick="selectAnswer(this, 4)">
+                    <img src="https://i.postimg.cc/Zq00LJsP/image.png" alt="Answer 2" class="answer-option" data-score="3" onclick="selectAnswer(this, 3)">
+                    <img src="https://i.postimg.cc/hGhh0KZ3/image.png" alt="Answer 3" class="answer-option" data-score="2" onclick="selectAnswer(this, 2)">
+                    <img src="https://i.postimg.cc/6QTThBbb/image.png" alt="Answer 4" class="answer-option" data-score="1" onclick="selectAnswer(this, 1)">
+                </div>
+                <div class="next-btn-container">
+                    <img src="https://i.postimg.cc/3RJHQYW7/NEXT.png" alt="Next" class="next-btn" onclick="nextQuestion(5)">
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้าคำถาม 5 - florheart-06.png -->
+        <div id="quiz5" class="page">
+            <!-- ปุ่มกลับหน้าแรก -->
+            <div class="home-button" onclick="goHome(this)">
+                <i class="fas fa-home"></i>
+                <span class="tooltip">กลับหน้าแรก</span>
+            </div>
+            
+            <div class="quiz-container">
+                <img src="https://i.postimg.cc/vZgp7jLv/Q5.png" alt="Question 5" class="question-image">
+                <div class="answers-grid">
+                    <img src="https://i.postimg.cc/wjCnwV05/image.png" alt="Answer 1" class="answer-option" data-score="4" onclick="selectAnswer(this, 4)">
+                    <img src="https://i.postimg.cc/P5pBbczb/image.png" alt="Answer 2" class="answer-option" data-score="3" onclick="selectAnswer(this, 3)">
+                    <img src="https://i.postimg.cc/t4ZLdftt/image.png" alt="Answer 3" class="answer-option" data-score="2" onclick="selectAnswer(this, 2)">
+                    <img src="https://i.postimg.cc/6p2DVSLd/image.png" alt="Answer 4" class="answer-option" data-score="1" onclick="selectAnswer(this, 1)">
+                </div>
+                <div class="next-btn-container">
+                    <img src="https://i.postimg.cc/3RJHQYW7/NEXT.png" alt="Next" class="next-btn" onclick="nextQuestion(6)">
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้าคำถาม 6 - florheart-07.png -->
+        <div id="quiz6" class="page">
+            <!-- ปุ่มกลับหน้าแรก -->
+            <div class="home-button" onclick="goHome(this)">
+                <i class="fas fa-home"></i>
+                <span class="tooltip">กลับหน้าแรก</span>
+            </div>
+            
+            <div class="quiz-container">
+                <img src="https://i.postimg.cc/Ssv6GZGL/Q6.png" alt="Question 6" class="question-image">
+                <div class="answers-grid">
+                    <img src="https://i.postimg.cc/0QBYCtCD/image.png" alt="Answer 1" class="answer-option" data-score="4" onclick="selectAnswer(this, 4)">
+                    <img src="https://i.postimg.cc/1tjGKWK6/image.png" alt="Answer 2" class="answer-option" data-score="3" onclick="selectAnswer(this, 3)">
+                    <img src="https://i.postimg.cc/50RBmPm8/image.png" alt="Answer 3" class="answer-option" data-score="2" onclick="selectAnswer(this, 2)">
+                    <img src="https://i.postimg.cc/hvQ9Z9C9/image.png" alt="Answer 4" class="answer-option" data-score="1" onclick="selectAnswer(this, 1)">
+                </div>
+                <div class="next-btn-container">
+                    <img src="https://i.postimg.cc/3RJHQYW7/NEXT.png" alt="Next" class="next-btn" onclick="goToCamera()">
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้ากล้อง - florheart-08.png -->
+        <div id="cameraPage" class="page">
+           
+         <!-- ส่วนแสดงตัวเลขนับถอยหลัง -->
+        <div id="countdown-display"></div>
+
+   
+        <!-- วิดีโอพื้นหลัง -->
+        <video class="bg-video" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;">
+        <source src="CAMERA_FINAL.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+        </video>
+
+    <!-- ปุ่มกลับหน้าแรก -->
+    <div class="home-button" onclick="goHome(this)">
+        <i class="fas fa-home"></i>
+        <span class="tooltip">กลับหน้าแรก</span>
+    </div>
+    
+    <div class="camera-container">
+        <div class="camera-frame">
+  <video id="video" width="720" height="560" autoplay muted playsinline></video>
+        </div>
+    </div>
+    <img src="https://i.postimg.cc/FKZ51SVp/tap-shoot-CAMERA.png" alt="Shoot" class="shoot-btn" onclick="capturePhoto()">
+</div>
+        
+        <!-- หน้าโหลดดิ้ง -->
+        <div id="loadingPage" class="page">
+            <!-- ปุ่มกลับหน้าแรก -->
+            <div class="home-button" onclick="goHome(this)">
+                <i class="fas fa-home"></i>
+                <span class="tooltip">กลับหน้าแรก</span>
+            </div>
+            
+            <video class="loading-video" autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;">
+                <source src="SNELL LOAD.mp4" type="video/mp4">
+                <!-- Fallback สำหรับบราวเซอร์ที่ไม่รองรับวิดีโอ -->
+                Your browser does not support the video tag.
+            </video>
+        </div>
+
+        <!-- หน้าผลลัพธ์ทั่วไป - florheart-10.png -->
+        <div id="resultPage" class="page result-page">
+            <!-- ปุ่มกลับหน้าแรก -->
+            <div class="home-button" onclick="goHome(this)">
+                <i class="fas fa-home"></i>
+                <span class="tooltip">กลับหน้าแรก</span>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-frame">
+                    <img id="capturedImage" src="" alt="Captured" class="captured-img">
+                    <img id="resultDecoration" src="" alt="Decoration" class="result-decoration">
+                    <div id="resultText" class="result-text"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้าผลลัพธ์ NIGHT-BLOOM - florheart-11.png -->
+        <div id="resultNightBloom" class="page result-page">
+            <!-- ปุ่มกลับหน้าแรก -->
+            <div class="home-button" onclick="goHome(this)">
+                <i class="fas fa-home"></i>
+                <span class="tooltip">กลับหน้าแรก</span>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-frame">
+                    <img id="capturedImage1" src="" alt="Captured" class="captured-img">
+                    <img src="https://i.postimg.cc/SxxPfPGw/FLOR-NIGHT-BLOOM.png" alt="Night Bloom" class="result-decoration">
+                </div>
+            </div>
+        </div>
+<script>
+/* ========= TouchDesigner TXT writer (remember file) ========= */
+const DB_NAME = 'td-fsa', STORE = 'handles', KEY = 'txtHandle';
+let tdFileHandle = null;
+
+/* IndexedDB helpers */
+function idbOpen(){
+  return new Promise((res,rej)=>{
+    const req = indexedDB.open(DB_NAME,1);
+    req.onupgradeneeded = ()=> {
+      const db = req.result;
+      if(!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);
+    };
+    req.onsuccess = ()=> res(req.result);
+    req.onerror   = ()=> rej(req.error);
+  });
+}
+async function idbGet(key){
+  const db = await idbOpen();
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(STORE,'readonly');
+    const st = tx.objectStore(STORE);
+    const req = st.get(key);
+    req.onsuccess = ()=> res(req.result ?? null);
+    req.onerror   = ()=> rej(req.error);
+  });
+}
+async function idbSet(key,val){
+  const db = await idbOpen();
+  return new Promise((res,rej)=>{
+    const tx = db.transaction(STORE,'readwrite');
+    const st = tx.objectStore(STORE);
+    const req = st.put(val,key);
+    req.onsuccess = ()=> res();
+    req.onerror   = ()=> rej(req.error);
+  });
+}
+
+/* permission */
+async function ensureRW(handle){
+  if(!handle) return false;
+  let p = await handle.queryPermission({mode:'readwrite'});
+  if(p === 'granted') return true;
+  if(p === 'prompt'){
+    p = await handle.requestPermission({mode:'readwrite'});
+    return p === 'granted';
+  }
+  return false;
+}
+
+/* เลือกไฟล์ครั้งแรก (เรียกใช้เมื่อสะดวก เช่นปุ่มเล็กๆมุมจอ) */
+async function pickTDFile(){
+  try{
+    const [h] = await window.showOpenFilePicker({
+      types: [{ description:'Text', accept:{'text/plain':['.txt']} }]
+    });
+    const ok = await ensureRW(h);
+    if(!ok){ console.log('TD file: no write permission'); return false; }
+    tdFileHandle = h;
+    await idbSet(KEY, h);
+    console.log('TD file chosen:', h.name);
+    return true;
+  }catch(e){
+    console.log('pickTDFile error:', e);
+    return false;
+  }
+}
+
+/* บันทึกข้อมูลไปไฟล์ในรูปแบบ key=value (TouchDesigner อ่านง่าย) */
+async function saveToTD(obj){
+  try{
+    if(!tdFileHandle){
+      // พยายามกู้คืนจาก IndexedDB
+      const saved = await idbGet(KEY);
+      if(saved) tdFileHandle = saved;
+    }
+    if(!tdFileHandle){
+      // ยังไม่เคยเลือก -> ขอให้ผู้ใช้เลือกครั้งเดียว
+      const ok = await pickTDFile();
+      if(!ok) { console.log('no TD file'); return; }
+    }
+    const ok = await ensureRW(tdFileHandle);
+    if(!ok){ console.log('TD file permission missing'); return; }
+
+    // เขียนไฟล์ (ทับทั้งไฟล์)
+    const text = Object.entries(obj).map(([k,v])=>`${k}=${v}`).join('\n') + '\n';
+    const w = await tdFileHandle.createWritable({ keepExistingData:false });
+    await w.write(text);
+    await w.close();
+    console.log('TD file saved:\n' + text);
+  }catch(e){
+    console.log('saveToTD error:', e);
+  }
+}
+
+/* กู้คืน handle อัตโนมัติหลังรีเฟรช (ไม่เด้งถาม) */
+document.addEventListener('DOMContentLoaded', async () => {
+  if(!('showOpenFilePicker' in window)){
+    console.log('File System Access API not supported (ใช้ Chrome/Edge + http://localhost หรือ HTTPS)');
+    return;
+  }
+  try{
+    const saved = await idbGet(KEY);
+    if(saved){
+      tdFileHandle = saved;
+      // อย่าขอ permission ทันที ปล่อยให้ขอตอน saveToTD เพื่อไม่กวนผู้ใช้
+      console.log('TD file handle restored');
+    }
+  }catch(e){
+    console.log('restore handle error:', e);
+  }
+});
+</script>
+        <!-- หน้าผลลัพธ์ NIGHT-CLOSE - florheart-12.png -->
+        <div id="resultNightClose" class="page result-page">
+            <!-- ปุ่มกลับหน้าแรก -->
+            <div class="home-button" onclick="goHome(this)">
+                <i class="fas fa-home"></i>
+                <span class="tooltip">กลับหน้าแรก</span>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-frame">
+                    <img id="capturedImage2" src="" alt="Captured" class="captured-img">
+                    <img src="https://i.postimg.cc/28mMVyLD/FLOR-NIGHT-CLOSED.png" alt="Night Close" class="result-decoration">
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้าผลลัพธ์ BUD - florheart-13.png -->
+        <div id="resultBud" class="page result-page">
+            <!-- ปุ่มกลับหน้าแรก -->
+            <div class="home-button" onclick="goHome(this)">
+                <i class="fas fa-home"></i>
+                <span class="tooltip">กลับหน้าแรก</span>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-frame">
+                    <img id="capturedImage3" src="" alt="Captured" class="captured-img">
+                    <img src="https://i.postimg.cc/J4mvG0H8/FLOR-BUD.png" alt="Bud" class="result-decoration">
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้าผลลัพธ์ EARLY-BLOOM - florheart-14.png -->
+        <div id="resultEarlyBloom" class="page result-page">
+            <!-- ปุ่มกลับหน้าแรก -->
+            <div class="home-button" onclick="goHome(this)">
+                <i class="fas fa-home"></i>
+                <span class="tooltip">กลับหน้าแรก</span>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-frame">
+                    <img id="capturedImage4" src="" alt="Captured" class="captured-img">
+                    <img src="https://i.postimg.cc/vHMkcTxM/FLOR-EARLY-BLOOM.png" alt="Early Bloom" class="result-decoration">
+                </div>
+            </div>
+        </div>
+
+        <!-- หน้าผลลัพธ์ EARLY-CLOSED -->
+        <div id="resultEarlyClosed" class="page result-page">
+            <!-- ปุ่มกลับหน้าแรก -->
+            <div class="home-button" onclick="goHome(this)">
+                <i class="fas fa-home"></i>
+                <span class="tooltip">กลับหน้าแรก</span>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-frame">
+                    <img id="capturedImage5" src="" alt="Captured" class="captured-img">
+                    <img src="https://i.postimg.cc/VL1pdv0c/FLOR-EARLY-CLOSED.png" alt="Early Closed" class="result-decoration">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function resultIdToCode(id){
+  switch(id){
+    case 'resultNightBloom':   return 1;
+    case 'resultNightClose':   return 2;
+    case 'resultBud':          return 3;
+    case 'resultEarlyBloom':   return 4;
+    case 'resultEarlyClosed':  return 5;
+    default:                   return 0; // กันพลาด
+  }
+}
+        let totalScore = 0;
+        let currentQuestion = 1;
+        let selectedAnswers = {};
+        let canvas, context;
+        let capturedImageData = null;
+        
+        // ตัวแปรสำหรับเก็บสถานะการโหลดโมเดล
+        let modelsLoaded = false;
+        let modelLoadingPromise = null;
+
+        // ฟังก์ชันโหลดโมเดลล่วงหน้า
+        function preloadModels() {
+            if (!modelLoadingPromise) {
+                modelLoadingPromise = loadFaceAPI().then(() => {
+                    modelsLoaded = true;
+                    console.log('Models preloaded successfully');
+                }).catch(error => {
+                    console.error('Failed to preload models:', error);
+                    modelsLoaded = false;
+                });
+            }
+            return modelLoadingPromise;
+        }
+
+        // เรียกโหลดโมเดลเมื่อโหลดหน้าเว็บ
+        document.addEventListener('DOMContentLoaded', function() {
+            // โหลดโมเดลล่วงหน้าหลังจาก 2 วินาที
+            setTimeout(preloadModels, 2000);
+        });
+
+        // เริ่มต้นกล้อง
+       async function initCamera() {
+  const videoEl = document.getElementById('video');
+  if (!videoEl) { console.warn('No #video element'); return; }
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { width: { ideal: 650 }, height: { ideal: 365 } }
+    });
+    videoEl.srcObject = stream;
+  } catch (err) {
+    console.error('Error accessing camera:', err);
+    alert('ไม่สามารถเข้าถึงกล้องได้ กรุณาตรวจสอบการอนุญาตใช้กล้อง');
+  }
+}
+
+        // เริ่มควิซ
+        function startQuiz() {
+            showPage('quiz1');
+            currentQuestion = 1;
+            totalScore = 0;
+            selectedAnswers = {};
+        }
+
+        // แสดงหน้า
+        
+
+        // เลือกคำตอบ
+        function selectAnswer(element, score) {
+            // ลบการเลือกเก่า
+            element.parentElement.querySelectorAll('.answer-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // เลือกใหม่
+            element.classList.add('selected');
+            selectedAnswers[currentQuestion] = score;
+        }
+
+        // ไปคำถามถัดไป
+        function nextQuestion(nextQ) {
+            if (!selectedAnswers[currentQuestion]) {
+                alert('กรุณาเลือกคำตอบก่อน');
+                return;
+            }
+            
+            totalScore += selectedAnswers[currentQuestion];
+            currentQuestion = nextQ;
+            showPage(`quiz${nextQ}`);
+        }
+
+        // ไปหน้ากล้อง
+        function goToCamera() {
+            if (!selectedAnswers[currentQuestion]) {
+                alert('กรุณาเลือกคำตอบก่อน');
+                return;
+            }
+            
+            totalScore += selectedAnswers[currentQuestion];
+            showPage('cameraPage');
+        }
+
+// ฟังก์ชันนี้จะเริ่มการนับถอยหลังเมื่อกดปุ่ม
+function capturePhoto() {
+    const shootButton = document.querySelector('.shoot-btn');
+    
+    // ถ้านับถอยหลังอยู่ ให้ไม่ทำอะไร
+    if (shootButton.classList.contains('disabled')) {
+        return;
+    }
+
+    // ปิดการใช้งานปุ่มชั่วคราว
+    shootButton.classList.add('disabled');
+
+    let countdown = 5;
+    const countdownEl = document.getElementById('countdown-display');
+    
+    // แสดงตัวเลขนับถอยหลัง
+    countdownEl.style.display = 'block';
+    countdownEl.textContent = countdown;
+
+    const countdownTimer = setInterval(() => {
+        countdown--;
+        if (countdown > 0) {
+            countdownEl.textContent = countdown;
+        } else {
+            // เมื่อนับถอยหลังครบ
+            clearInterval(countdownTimer); // หยุดตัวจับเวลา
+            countdownEl.style.display = 'none'; // ซ่อนตัวเลข
+            doActualCapture(); // เรียกฟังก์ชันถ่ายรูปจริง
+            // ปุ่มจะถูกเปิดใช้งานใหม่เมื่อกลับมาหน้ากล้องครั้งต่อไป (ผ่านฟังก์ชัน _showPage)
+        }
+    }, 1000); // ทำงานทุก 1 วินาที
+}
+
+// ฟังก์ชันนี้คือตรรกะการถ่ายรูปจริง
+function doActualCapture() {
+    const videoEl = document.getElementById('video');
+    if (!videoEl) { console.warn('No #video element'); return; }
+
+    canvas = document.createElement('canvas');
+    canvas.width = videoEl.videoWidth;
+    canvas.height = videoEl.videoHeight;
+    context = canvas.getContext('2d');
+    context.drawImage(videoEl, 0, 0);
+
+    capturedImageData = canvas.toDataURL('image/png');
+
+    if (videoEl.srcObject) {
+        videoEl.srcObject.getTracks().forEach(track => track.stop());
+    }
+
+    showPage('loadingPage');
+    setTimeout(() => { processResult(); }, 3000);
+}
+        // ประมวลผลผลลัพธ์ (เวอร์ชันเร็วขึ้น)
+        async function processResult() {
+  let shownResult = false;   // ธงบอกว่าโชว์ผลสำเร็จแล้วหรือยัง
+  try {
+    let isSmiling = false;
+    let useRealDetection = false;
+
+    // ====== ตรวจจับรอยยิ้ม (เหมือนเดิม) ======
+    if (modelsLoaded) {
+      try {
+        const detectionPromise = detectSmile(capturedImageData);
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Detection timeout')), 5000);
+        });
+        isSmiling = await Promise.race([detectionPromise, timeoutPromise]);
+        useRealDetection = true;
+      } catch (err) {
+        // ถ้าพัง ค่อยไปสุ่มทีหลัง
+        console.warn('Smile detection failed, fallback to random:', err);
+      }
+    }
+    if (!useRealDetection) {
+      await new Promise(r => setTimeout(r, 1000)); // ให้เห็นหน้า loading นิดนึง
+      isSmiling = Math.random() > 0.5;
+    }
+
+    // ====== ตัดสินหน้า result ======
+    let resultPageId;
+    if (totalScore >= 1 && totalScore < 9) {
+      resultPageId = isSmiling ? 'resultNightBloom' : 'resultNightClose';
+    } else if (totalScore >= 9 && totalScore < 17) {
+      resultPageId = 'resultBud';
+    } else if (totalScore >= 17 && totalScore < 25) {
+      resultPageId = isSmiling ? 'resultEarlyBloom' : 'resultEarlyClosed';
+    } else {
+      // กันไว้เผื่อคะแนนหลุดช่วง
+      resultPageId = 'resultBud';
+    }
+
+    // ====== โชว์ผลลัพธ์ "ก่อน" ทำงานอื่น เพื่อกันจังหวะเด้ง ======
+    document.getElementById('capturedImage1').src = capturedImageData;
+    document.getElementById('capturedImage2').src = capturedImageData;
+    document.getElementById('capturedImage3').src = capturedImageData;
+    document.getElementById('capturedImage4').src = capturedImageData;
+    document.getElementById('capturedImage5').src = capturedImageData;
+    showPage(resultPageId);
+    lockResult(2);
+    shownResult = true;       // บอกว่าขึ้นหน้าผลแล้ว
+const resultCode = resultIdToCode(resultPageId);
+    // ====== บันทึกค่าไป TouchDesigner (ไม่ให้ล้มทั้งฟังก์ชัน) ======
+    saveToTD({
+  score: totalScore,
+  smiling: isSmiling ? 1 : 0.21,
+  method: useRealDetection ? 'ai' : 'random',
+    result: resultCode,              // สำหรับ TD อ่านง่าย
+  result_name: resultPageId,       // เผื่อ debug/ตรวจสอบ
+
+  time: Date.now()
+}).catch(e => console.warn('saveToTD failed (ignored):', e));
+
+    // log ดีบัก
+    console.log('Total Score:', totalScore);
+    console.log('Is Smiling:', isSmiling);
+    console.log('Detection Method:', useRealDetection ? 'Real AI' : 'Random');
+    console.log('Result Page:', resultPageId);
+
+  } catch (error) {
+    console.error('Error processing result:', error);
+
+ 
+    }
+  }
+
+
+        // โหลด face-api.js และโมเดลที่จำเป็น (เวอร์ชันเร็ว)
+        async function loadFaceAPI() {
+            try {
+                console.log('Loading Face API models...');
+                
+                // ตั้งเวลาหมดอายุ 10 วินาที
+                const timeoutPromise = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error('Model loading timeout')), 10000);
+                });
+                
+                // โหลดโมเดลแบบขนาดเล็กและเร็วกว่า
+                const loadPromise = Promise.all([
+                    faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights'),
+                    faceapi.nets.faceExpressionNet.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights')
+                ]);
+                
+                // รอให้โหลดเสร็จหรือหมดเวลา
+                await Promise.race([loadPromise, timeoutPromise]);
+                
+                console.log('Face API models loaded successfully');
+                return true;
+            } catch (error) {
+                console.error('Error loading Face API models:', error);
+                return false;
+            }
+        }
+
+        // ตรวจจับรอยยิ้มจากรูปภาพ
+        async function detectSmile(imageData) {
+            try {
+                // สร้าง element img ชั่วคราว
+                const img = document.createElement('img');
+                img.src = imageData;
+                
+                // รอให้รูปโหลดเสร็จ
+                await new Promise((resolve, reject) => {
+                    img.onload = resolve;
+                    img.onerror = reject;
+                });
+                
+                // ตรวจจับใบหน้าและอารมณ์
+                const detections = await faceapi
+                    .detectAllFaces(img, new faceapi.TinyFaceDetectorOptions())
+                    .withFaceExpressions();
+                
+                // ถ้าไม่พบใบหน้า
+                if (detections.length === 0) {
+                    console.log('No face detected');
+                    return false;
+                }
+                
+                // ตรวจสอบอารมณ์ "happy" ของใบหน้าแรก
+                const expressions = detections[0].expressions;
+                const happyScore = expressions.happy;
+                
+                console.log('Face expressions:', expressions);
+                console.log('Happy score:', happyScore);
+                
+                // ถ้าคะแนนความสุขมากกว่า 0.7 ถือว่ายิ้ม
+                return happyScore > 0.7;
+            } catch (error) {
+                console.error('Error detecting smile:', error);
+                throw error;
+            }
+        }
+
+        // ฟังก์ชันสำหรับกลับหน้าแรก
+     function goHome(element, evt, force = false) {
+  const e = evt || window.event;
+
+  // ถ้ายังล็อกอยู่และไม่ได้ force -> ไม่กลับ
+  if (!force && !canNavigate()) {
+    console.warn('[HOME] blocked by lock');
+    return;
+  }
+
+  // ripple effect (กัน error event undefined)
+  if (element && e && e.clientX != null && e.clientY != null) {
+    const ripple = document.createElement('span');
+    ripple.classList.add('ripple');
+    const rect = element.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = e.clientX - rect.left - size / 2;
+    const y = e.clientY - rect.top - size / 2;
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = x + 'px';
+    ripple.style.top = y + 'px';
+    element.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+  }
+
+  // หยุดกล้องถ้ามี
+  if (typeof video !== 'undefined' && video && video.srcObject) {
+    video.srcObject.getTracks().forEach(track => track.stop());
+  }
+
+  // ✅ ยิงค่าศูนย์กลับไปให้ TouchDesigner
+  // (ไม่ await เพื่อไม่ให้ UI หน่วง; ถ้าพลาดจะ log ไว้เฉย ๆ)
+  saveToTD({
+    score: 0,
+    smiling: 0,
+    method: 'reset',      // แท็กไว้เฉย ๆ ว่ามาจากการรีเซ็ต
+    result: 0,
+    result_name: 'none',
+    time: Date.now()
+  }).catch(e => console.warn('saveToTD reset failed (ignored):', e));
+
+  // รีเซ็ตสถานะฝั่งเว็บ
+  currentQuestion = 1;
+  totalScore = 0;
+  selectedAnswers = {};
+  capturedImageData = null;
+
+  // ถ้ามีรูปแสดงอยู่ เคลียร์ src ออก (กันภาพค้าง)
+  ['capturedImage','capturedImage1','capturedImage2','capturedImage3','capturedImage4','capturedImage5']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.src = ''; });
+
+  // ปลดล็อก + ล้าง result id
+  resultLockUntil = 0;
+  if (typeof currentResultId !== 'undefined') currentResultId = null;
+
+  // ไปหน้าแรก (ข้ามตัวล็อก เพราะเราตั้งใจกลับเอง)
+  _showPage('homePage');
+}
+
+    </script>
+    <script>
+/* ===== HARD LOCK ENFORCER (วางก่อน </body>) ===== */
+function getActivePageId(){
+  const el = document.querySelector('.page.active');
+  return el ? el.id : null;
+}
+
+let currentResultId = null;
+
+// 1) เอา showPage ปัจจุบันมาเก็บไว้ แล้วห่อด้วยการเช็คล็อก
+const _origShowPage = window.showPage || function(pid){
+  // fallback ถ้าไม่มี (ไม่น่าเกิด)
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pid)?.classList.add('active');
+};
+
+function guardedShowPage(pageId){
+  // บล็อกการกลับบ้าน/เข้ากล้องระหว่างล็อก
+  if ((pageId === 'homePage' || pageId === 'cameraPage') && Date.now() < (window.resultLockUntil || 0)) {
+    console.warn('[NAV] blocked (hard lock active) ->', pageId);
+    return;
+  }
+  // ผ่านได้
+  _origShowPage(pageId);
+  console.log('[NAV] ->', pageId, '(guarded)');
+}
+window.showPage = guardedShowPage;
+
+// 2) ล็อกไม่ให้มีใคร override showPage ได้อีก
+try {
+  Object.defineProperty(window, 'showPage', { writable: false });
+} catch(e) {
+  console.warn('freeze showPage failed (non-critical):', e);
+}
+
+// 3) ตัวบังคับหน้า: ถ้าใครแอบสลับหน้า ระหว่างล็อก -> ดึงกลับ
+setInterval(() => {
+  if (!window.resultLockUntil || Date.now() >= window.resultLockUntil) return;
+  if (!currentResultId) return;
+  const act = getActivePageId();
+  if (act && act !== currentResultId) {
+    console.warn('[ENFORCE] revert', act, '->', currentResultId);
+    // ใช้ _showPage ถ้ามี (เร็วกว่า) ไม่ผ่านตัวล็อกเพราะเราตั้งใจบังคับเอง
+    if (typeof window._showPage === 'function') {
+      window._showPage(currentResultId);
+    } else {
+      _origShowPage(currentResultId);
+    }
+  }
+}, 150);
+
+// 4) ฟังก์ชันตั้งล็อก + โอเวอร์เลย์โชว์เวลา
+function setResultLock(pageId, seconds = 10){
+  currentResultId = pageId;
+  window.resultLockUntil = Date.now() + seconds * 1000;
+  showLockOverlay(seconds);
+}
+
+// overlay นับถอยหลัง
+let _lockTimer;
+function showLockOverlay(seconds){
+  // สร้าง overlay หนึ่งครั้ง
+  let box = document.getElementById('lockOverlay');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'lockOverlay';
+    Object.assign(box.style, {
+      position:'fixed', right:'16px', top:'16px',
+      background:'rgba(0,0,0,0.6)', color:'#fff',
+      padding:'8px 12px', borderRadius:'12px',
+      font:'14px/1.4 sans-serif', zIndex: 5000,
+      pointerEvents:'none'
+    });
+    document.body.appendChild(box);
+  }
+  clearInterval(_lockTimer);
+  const end = Date.now() + seconds*1000;
+  _lockTimer = setInterval(()=>{
+    const remain = Math.max(0, end - Date.now());
+    box.textContent = `Result locked: ${(remain/1000).toFixed(1)}s`;
+    if (remain <= 0){
+      clearInterval(_lockTimer);
+      box.textContent = 'Unlocked';
+      setTimeout(()=> box.remove(), 800);
+    }
+  }, 100);
+}
+
+// 5) เผยแพร่ให้ processResult เรียกง่าย ๆ
+window.setResultLock = setResultLock;
+</script>
+
+</body>
+</html>
