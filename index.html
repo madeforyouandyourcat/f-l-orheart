@@ -317,7 +317,7 @@
 }
 @media (max-width: 768px) {
     .question-image {
-        width: clamp(80px, 20vw, 300px) !important;
+        width: clamp(80px, 20vw, 300px);
         margin-top: 1vh;
         margin-bottom: 2vh;
     }
@@ -410,20 +410,20 @@
         }
 
         /* หน้ากล้อง - florheart-08.png */
-      #cameraPage {
-    background-size: cover;
-    background-position: center;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    padding-left: 40px;
-    position: fixed;        /* ← เปลี่ยนจาก relative เป็น fixed */
-    top: 0;
-    left: 0;
-    width: 100%;            /* ← เปลี่ยนจาก 100vw */
-    height: 100%;           /* ← เปลี่ยนจาก 100vh */
-    overflow: hidden;       /* ← เปลี่ยนกลับเป็น hidden */
+  #cameraPage {
+        background-size: cover; /* ปรับเป็น cover สำหรับวิดีโอ */
+        background-position: center;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding-left: 40px;
+        position: relative; /* เพิ่มเพื่อรองรับวิดีโอพื้นหลัง */
+        width: 100vw;
+        height: 100vh;
+        overflow-y: auto;      /* ← เปลี่ยนจาก hidden เป็น auto */
+        overflow-x: hidden;
 }
+
 
     /* เพิ่มคลาสสำหรับวิดีโอพื้นหลัง */
     .bg-video {
