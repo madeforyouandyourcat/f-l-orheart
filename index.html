@@ -317,21 +317,27 @@
 }
 @media (max-width: 768px) {
     .question-image {
-        width: clamp(250px, 75vw, 400px) !important;  /* ← ใหญ่ขึ้น */
+        width: clamp(80px, 20vw, 300px);  /* ← เล็กลงบนมือถือ */
         margin-top: 1vh;
         margin-bottom: 2vh;
     }
 
     .answers-grid {
-        grid-template-columns: 1fr;  /* ← เรียงลงมาเลย */
-        gap: 2vh;
-        width: 85%;
+        grid-template-columns: repeat(2, 1fr);  /* ← เปลี่ยนเป็น 2 คอลัมน์ */
+        gap: 1.5vh 2vw;
+        width: 95%;
     }
 
     .answer-option {
         max-width: 100%;
         width: 100%;
     }
+
+    .quiz-container {
+        padding-top: 10px;   /* ← ลด padding บน */
+        padding-bottom: 100px;
+    }
+}
 
     .quiz-container {
         padding-top: 10px;
