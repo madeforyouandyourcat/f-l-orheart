@@ -448,6 +448,29 @@
     margin-bottom: 16px;
     width: clamp(280px, 55vw, 570px);  /* ← เปลี่ยนตรงนี้ */
 }
+        /* iPad */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .camera-container {
+        margin-left: 5vw;
+        width: 58vw;
+    }
+}
+
+/* มือถือแนวตั้ง */
+@media (max-width: 768px) and (orientation: portrait) {
+    .camera-container {
+        margin-left: 3vw;
+        width: 80vw;
+    }
+}
+
+/* มือถือแนวนอน */
+@media (max-height: 500px) and (orientation: landscape) {
+    .camera-container {
+        margin-left: 5vw;
+        width: 55vw;
+    }
+}
 
 .camera-frame {
     position: relative;
